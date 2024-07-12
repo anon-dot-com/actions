@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "~*": ["./*"],
+      "@anon/browser": ["../browser/dist"],
+      "@anon/account-types": ["../types/svc/account/dist"],
+      "@anon/proxy-types": ["../types/svc/proxy/dist"]
+    },
+    "baseUrl": ".",
+    "outDir": "./dist",
+    "lib": ["esnext"],
+    "module": "esnext",
+    "target": "esnext",
+    "strict": true,
+    "allowJs": true,
+    "skipLibCheck": true,
+    "inlineSources": false,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "declarationMap": true,
+    "declaration": true,
+    "sourceMap": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "**/*.test.ts"]
+}

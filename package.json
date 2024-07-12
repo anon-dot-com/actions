@@ -1,0 +1,30 @@
+{
+  "name": "@anon/actions",
+  "version": "0.4.1",
+  "description": "Your new magic swiss army knife for login.",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "exports": {
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
+  "scripts": {
+    "build": "tsc",
+    "postinstall": "just installDependencies"
+  },
+  "keywords": [],
+  "author": "Anonymity Labs",
+  "devDependencies": {
+    "@tsconfig/node18": "^18.2.4",
+    "@types/node": "^20.13.0",
+    "rollup": "4.18.0"
+  },
+  "dependencies": {
+    "playwright": "^1.43.1",
+    "playwright-extra": "^4.3.6"
+  },
+  "files": [
+    "dist/**/*"
+  ]
+}
