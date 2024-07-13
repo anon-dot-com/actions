@@ -34,6 +34,22 @@ export class NetworkHelper {
     }
   }
 
+  async waitForSelector(
+    page: Page,
+    selector: string,
+    state?: "attached" | "detached" | "visible" | "hidden",
+    timeout: number = this.networkTimeout,
+  ) {
+    console.log(`Waiting for selector: ${selector}...`);
+    try {
+      const result = await page.waitForSelector(selector, { state, timeout });
+      console.log(`Selector found: ${selector}`);
+      return result;
+    } catch (error) {
+      console.warn(`Selector not found: ${selector}`);
+    }
+  }
+
   async retryWithBackoff<T>(
     action: () => Promise<T>,
     maxRetries: number = this.maxRetries,
