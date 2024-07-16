@@ -43,6 +43,8 @@ mkYarnPackage rec {
     ];
   };
 
+  workspaceDependencies = [ ];
+
   nativeBuildInputs = [ typescript ];
 
   buildPhase = ''
