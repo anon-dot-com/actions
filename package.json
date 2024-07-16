@@ -1,6 +1,6 @@
 {
   "name": "@anon/actions",
-  "version": "0.4.1",
+  "version": "0.1.0",
   "description": "Your new magic swiss army knife for login.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

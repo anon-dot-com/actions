@@ -20,8 +20,6 @@ installDependencies:
  build_yarn $anonDependencies
 
 publish:
-  #!/usr/bin/env nix-shell
-  #!nix-shell -i bash -p cloudsmith-cli -I nixpkgs=https://github.com/NixOS/nixpkgs/archive/9957cd48326fe8dbd52fdc50dd2502307f188b0d.tar.gz
   export CLOUDSMITH_API_KEY=`op read -n "op://{{vault}}/{{item}}/apikey"`
 
   VERSION=$(jq -r '.version' package.json)
@@ -29,3 +27,20 @@ publish:
 
   nix build '.#dist'
   cloudsmith push npm anon/actions "./result/tarballs/${TARBALL}"
+
+push target_branch="main":
+  #!/usr/bin/env bash
+  # we use git subtree here to push the actions library directory to a separate repo 
+  # this lets us have a single source of truth while keeping the monorepo private
+  # https://github.com/anon-dot-com/actions
+
+  current_branch=$(git branch --show-current)
+
+  if [ "$current_branch" == "development" ] || [ "{{target_branch}}" != "main" ]; then
+    echo "Publishing actions library to actions repo"
+    # git subtree must be run from project root
+    cd {{justfile_directory()}}/../../ && \
+    git subtree -P lib/actions push git@github.com:anon-dot-com/actions.git {{target_branch}}
+  else
+    echo "You must be on the development branch in the monorepo to push to the main branch of actions repo."
+  fi
