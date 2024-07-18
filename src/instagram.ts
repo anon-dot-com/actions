@@ -1,39 +1,189 @@
 import { Page } from "playwright";
+import { NetworkHelper } from "./networkHelper";
 
-export const runSendMessageOnInstagramAction = async (page: Page) => {
-  page.goto("https://www.instagram.com");
-  await page.waitForLoadState();
+const TIMEOUT = 30000; // 30 seconds
 
-  await page.goto("https://instagram.com/direct/inbox");
+export const runSendInstagramMessage =
+  (networkHelper: NetworkHelper, recipient: string, message: string) =>
+  async (page: Page) => {
+    try {
+      await handleNotificationModal(page, networkHelper);
+      await navigateToDirectInbox(page, networkHelper);
+      await selectRecipient(page, networkHelper, recipient);
+      await sendMessage(page, networkHelper, message);
 
-  await page.waitForLoadState();
-  await page.waitForTimeout(3000);
+      console.log("Message sent successfully");
+      await networkHelper.takeScreenshot(page, "instagram", "message-sent");
+    } catch (error) {
+      console.error("An error occurred:", error);
+      await networkHelper.takeScreenshot(page, "instagram", "error-state");
+      throw error; // Re-throw the error for upstream handling
+    } finally {
+      await page.close();
+    }
+  };
 
-  // Check for the "Turn on Notifications" modal and click "Not Now" if it appears
-  const modalSelector = 'text="Turn on Notifications"'; // Adjust the selector to be more specific if necessary
-  const notNowButton = 'text="Not Now"'; // Adjust if necessary
+async function navigateToDirectInbox(page: Page, networkHelper: NetworkHelper) {
+  await networkHelper.retryWithBackoff(async () => {
+    // Wait for the mail icon to be visible
+    const mailIconSelector = 'a[href="/direct/inbox/"]';
+    await networkHelper.waitForSelector(
+      page,
+      mailIconSelector,
+      "visible",
+      TIMEOUT,
+    );
 
-  if (await page.isVisible(modalSelector)) {
+    // Click on the mail icon
+    await page.click(mailIconSelector);
+
+    // Wait for the inbox page to load
+    await networkHelper.waitForPageLoad(page);
+    await networkHelper.waitForNetworkIdle(page);
+
+    // Verify that we're on the inbox page
+    const inboxUrlPattern = /https:\/\/www\.instagram\.com\/direct\/inbox\//;
+    await page.waitForURL(inboxUrlPattern, { timeout: TIMEOUT });
+
+    console.log("Navigated to Direct Inbox");
+  });
+}
+
+async function handleNotificationModal(
+  page: Page,
+  networkHelper: NetworkHelper,
+) {
+  const modalSelector = 'div[role="dialog"]';
+  const notNowButton = 'button:has-text("Not Now")';
+
+  const modalVisible = await page.isVisible(modalSelector, { timeout: 5000 });
+  if (modalVisible) {
     await page.click(notNowButton);
+    console.log("Clicked 'Not Now' on notification modal");
+    await networkHelper.waitForNetworkIdle(page);
   }
+}
 
-  await page.waitForSelector('div[role="listitem"]');
-  const firstUserSelector = 'div[role="listitem"] div:nth-of-type(1)';
+async function selectRecipient(
+  page: Page,
+  networkHelper: NetworkHelper,
+  recipient: string,
+) {
+  await networkHelper.retryWithBackoff(async () => {
+    // Click on the "New message" SVG button
+    const newMessageButtonSelector = 'svg[aria-label="New message"]';
+    await networkHelper.waitForSelector(
+      page,
+      newMessageButtonSelector,
+      "visible",
+      TIMEOUT,
+    );
+    await page.click(newMessageButtonSelector);
+    console.log("Clicked on 'New message' button");
 
-  await page.click(firstUserSelector);
+    // Wait for the recipient search modal to appear
+    const searchModalSelector = 'div[role="dialog"]';
+    await networkHelper.waitForSelector(
+      page,
+      searchModalSelector,
+      "visible",
+      TIMEOUT,
+    );
+    console.log("Recipient search modal appeared");
 
-  console.log("Clicked on user");
-  await page.waitForLoadState();
+    // Wait for and click on the search input
+    const searchInput = await networkHelper.waitForSelector(
+      page,
+      'input[placeholder="Search..."]',
+      "visible",
+      5000,
+    );
+    if (!searchInput) {
+      throw new Error(
+        "Search input for finding a user on Instagram's receipt messenging modal not found",
+      );
+    }
+    await searchInput.click();
+    await searchInput.fill(recipient);
+    await networkHelper.waitForNetworkIdle(page);
 
-  await page.waitForTimeout(3000);
-  await page.waitForSelector('div[aria-describedby="Message"]');
+    // Wait for and click on the recipient
 
-  console.log("About to write 'sup' message");
-  // Wait for the message content to load
-  // Wait for the message box to be ready and type the message
-  await page.fill('div[aria-describedby="Message"]', "Sup"); // Replace the placeholder text as needed
-  console.log("About to send message");
-  await page.click('div[role="button"]:has-text("Send")');
-  console.log("Sent a message");
-  await page.close();
-};
+    const combinedSelector = `div[role="button"]:has-text("${recipient}") input[type="checkbox"]`;
+    const checkbox = await networkHelper.waitForSelector(
+      page,
+      combinedSelector,
+      "visible",
+      5000,
+    );
+    if (!checkbox) {
+      throw new Error(`Checkbox for recipient "${recipient}" not found`);
+    }
+    await checkbox.click();
+    await networkHelper.waitForNetworkIdle(page);
+
+    // Wait for and click the "Chat" button
+    const chatButton = await networkHelper.waitForSelector(
+      page,
+      'div[role="button"]:has-text("Chat")',
+      "visible",
+      5000,
+    );
+    if (!chatButton) {
+      throw new Error("Chat button to select recipient not found");
+    }
+    await chatButton.click();
+    await networkHelper.waitForNetworkIdle(page);
+
+    console.log(`Selected recipient: ${recipient}`);
+  });
+}
+
+async function sendMessage(
+  page: Page,
+  networkHelper: NetworkHelper,
+  message: string,
+) {
+  await networkHelper.retryWithBackoff(async () => {
+    const messageInputSelector = 'div[aria-label="Message"] p';
+    await networkHelper.waitForSelector(
+      page,
+      messageInputSelector,
+      "visible",
+      TIMEOUT,
+    );
+
+    // Type the message
+    await page.fill(messageInputSelector, message);
+    console.log("Message typed");
+
+    // Locate and click the "Send" button
+    const sendButtonSelector = 'div[role="button"]:has-text("Send")';
+    await networkHelper.waitForSelector(
+      page,
+      sendButtonSelector,
+      "visible",
+      TIMEOUT,
+    );
+    await page.click(sendButtonSelector);
+    console.log("Send button clicked");
+
+    // Wait for the message to be sent
+    await waitForMessageSent(page, networkHelper);
+  });
+}
+
+async function waitForMessageSent(page: Page, networkHelper: NetworkHelper) {
+  await networkHelper.retryWithBackoff(async () => {
+    // Wait for the "Seen" indicator to appear or for the message to be marked as sent
+    const sentIndicatorSelector =
+      'span:has-text("Seen"), span:has-text("Sent")';
+    await networkHelper.waitForSelector(
+      page,
+      sentIndicatorSelector,
+      "visible",
+      TIMEOUT,
+    );
+    console.log("Message sent successfully");
+  });
+}
