@@ -1,13 +1,36 @@
 {
   "name": "@anon/actions",
-  "version": "0.1.0",
-  "description": "Your new magic swiss army knife for login.",
+  "version": "0.1.1",
+  "description": "Run useful automated scripts on the most popular websites with Anon",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "type": "module",
   "exports": {
-    "import": "./dist/index.js",
-    "require": "./dist/index.cjs"
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./ipAddressUtil": {
+      "import": "./dist/ipAddressUtil/index.js",
+      "require": "./dist/ipAddressUtil/index.cjs",
+      "types": "./dist/ipAddressUtil/index.d.ts"
+    },
+    "./amazon": {
+      "import": "./dist/amazon/index.js",
+      "require": "./dist/amazon/index.cjs",
+      "types": "./dist/amazon/index.d.ts"
+    },
+    "./linkedin": {
+      "import": "./dist/linkedin/index.js",
+      "require": "./dist/linkedin/index.cjs",
+      "types": "./dist/linkedin/index.d.ts"
+    },
+    "./instagram": {
+      "import": "./dist/instagram/index.js",
+      "require": "./dist/instagram/index.cjs",
+      "types": "./dist/instagram/index.d.ts"
+    }
   },
   "scripts": {
     "build": "tsc",
@@ -18,7 +41,8 @@
   "devDependencies": {
     "@tsconfig/node18": "^18.2.4",
     "@types/node": "^20.13.0",
-    "rollup": "4.18.0"
+    "rollup": "4.18.0",
+    "tsconfig-paths": "^4.2.0"
   },
   "dependencies": {
     "playwright": "^1.43.1",

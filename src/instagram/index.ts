@@ -1,16 +1,22 @@
 import { Page } from "playwright";
-import { NetworkHelper } from "./networkHelper";
+import { NetworkHelper } from "../networkHelper.js";
 
-const TIMEOUT = 30000; // 30 seconds
-
-export const runSendInstagramMessage =
+/**
+ * Sends a direct message to a specified recipient on Instagram.
+ *
+ * @param networkHelper - Helper object for network-related operations
+ * @param recipient - The username of the message recipient - This user will be on the home page
+ * @param message - The content of the message to be sent
+ * @returns A function that takes a Playwright Page object and performs the message sending operation
+ */
+export const sendMessage =
   (networkHelper: NetworkHelper, recipient: string, message: string) =>
   async (page: Page) => {
     try {
-      await handleNotificationModal(page, networkHelper);
+      await closeNotificationModal(page, networkHelper);
       await navigateToDirectInbox(page, networkHelper);
-      await selectRecipient(page, networkHelper, recipient);
-      await sendMessage(page, networkHelper, message);
+      await selectRecipientOnDirectMessage(page, networkHelper, recipient);
+      await sendMessageOnMessageModal(page, networkHelper, message);
 
       console.log("Message sent successfully");
       await networkHelper.takeScreenshot(page, "instagram", "message-sent");
@@ -23,7 +29,16 @@ export const runSendInstagramMessage =
     }
   };
 
-async function navigateToDirectInbox(page: Page, networkHelper: NetworkHelper) {
+/**
+ * Navigates to the Instagram Direct Inbox.
+ *
+ * @param page - Playwright Page object. This action should be able to run on any page
+ * @param networkHelper - Helper object for network-related operations
+ */
+export async function navigateToDirectInbox(
+  page: Page,
+  networkHelper: NetworkHelper,
+) {
   await networkHelper.retryWithBackoff(async () => {
     // Wait for the mail icon to be visible
     const mailIconSelector = 'a[href="/direct/inbox/"]';
@@ -31,7 +46,7 @@ async function navigateToDirectInbox(page: Page, networkHelper: NetworkHelper) {
       page,
       mailIconSelector,
       "visible",
-      TIMEOUT,
+      networkHelper.networkTimeout,
     );
 
     // Click on the mail icon
@@ -43,20 +58,30 @@ async function navigateToDirectInbox(page: Page, networkHelper: NetworkHelper) {
 
     // Verify that we're on the inbox page
     const inboxUrlPattern = /https:\/\/www\.instagram\.com\/direct\/inbox\//;
-    await page.waitForURL(inboxUrlPattern, { timeout: TIMEOUT });
+    await page.waitForURL(inboxUrlPattern, {
+      timeout: networkHelper.networkTimeout,
+    });
 
     console.log("Navigated to Direct Inbox");
   });
 }
 
-async function handleNotificationModal(
+/**
+ * Handles the notification modal if it appears.
+ *
+ * @param page - Playwright Page object. This action should be able to run on any page
+ * @param networkHelper - Helper object for network-related operations
+ */
+export async function closeNotificationModal(
   page: Page,
   networkHelper: NetworkHelper,
 ) {
   const modalSelector = 'div[role="dialog"]';
   const notNowButton = 'button:has-text("Not Now")';
 
-  const modalVisible = await page.isVisible(modalSelector, { timeout: 5000 });
+  const modalVisible = await page.isVisible(modalSelector, {
+    timeout: networkHelper.networkTimeout,
+  });
   if (modalVisible) {
     await page.click(notNowButton);
     console.log("Clicked 'Not Now' on notification modal");
@@ -64,7 +89,14 @@ async function handleNotificationModal(
   }
 }
 
-async function selectRecipient(
+/**
+ * Opens up a new message modal and selects a recipient.
+ *
+ * @param page - Playwright Page object. The page should be on the Direct Inbox page
+ * @param networkHelper - Helper object for network-related operations
+ * @param recipient - The username of the message recipient
+ */
+export async function selectRecipientOnDirectMessage(
   page: Page,
   networkHelper: NetworkHelper,
   recipient: string,
@@ -76,7 +108,7 @@ async function selectRecipient(
       page,
       newMessageButtonSelector,
       "visible",
-      TIMEOUT,
+      networkHelper.networkTimeout,
     );
     await page.click(newMessageButtonSelector);
     console.log("Clicked on 'New message' button");
@@ -87,7 +119,7 @@ async function selectRecipient(
       page,
       searchModalSelector,
       "visible",
-      TIMEOUT,
+      networkHelper.networkTimeout,
     );
     console.log("Recipient search modal appeared");
 
@@ -139,7 +171,14 @@ async function selectRecipient(
   });
 }
 
-async function sendMessage(
+/**
+ * Sends a message to the selected recipient.
+ *
+ * @param page - Playwright Page object. This assumes that the page is on the direct message inbox page with the message modal open.
+ * @param networkHelper - Helper object for network-related operations
+ * @param message - The content of the message to be sent
+ */
+export async function sendMessageOnMessageModal(
   page: Page,
   networkHelper: NetworkHelper,
   message: string,
@@ -150,7 +189,7 @@ async function sendMessage(
       page,
       messageInputSelector,
       "visible",
-      TIMEOUT,
+      networkHelper.networkTimeout,
     );
 
     // Type the message
@@ -163,7 +202,7 @@ async function sendMessage(
       page,
       sendButtonSelector,
       "visible",
-      TIMEOUT,
+      networkHelper.networkTimeout,
     );
     await page.click(sendButtonSelector);
     console.log("Send button clicked");
@@ -182,8 +221,16 @@ async function waitForMessageSent(page: Page, networkHelper: NetworkHelper) {
       page,
       sentIndicatorSelector,
       "visible",
-      TIMEOUT,
+      networkHelper.networkTimeout,
     );
     console.log("Message sent successfully");
   });
 }
+
+export default {
+  sendMessage,
+  navigateToDirectInbox,
+  closeNotificationModal,
+  selectRecipientOnDirectMessage,
+  sendMessageOnMessageModal,
+};

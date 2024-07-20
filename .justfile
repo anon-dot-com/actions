@@ -7,8 +7,20 @@ install:
   yarn install
 
 build: install
-  yarn run build
-  npx rollup dist/index.js --file dist/index.cjs --format cjs
+    #!/usr/bin/env nu
+    yarn run build
+
+    npx rollup dist/index.js --file dist/index.cjs --format cjs
+
+    # Define the directories to process
+    let directories = ["amazon", "linkedin", "instagram", "ipAddressUtil"]
+
+    # Loop through each directory and run rollup
+    for dir in $directories {
+        let input_file = $"dist/($dir)/index.js"
+        let output_file = $"dist/($dir)/index.cjs"
+        npx rollup $input_file --file $output_file --format cjs
+    }
 
 nix:
   nix build
