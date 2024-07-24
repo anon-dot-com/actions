@@ -24,21 +24,31 @@ This library provides ready-to-use browser scripts written in [Playwright](https
 on consumer applications, such as LinkedIn and Amazon, showcasing how Anon can be used to build powerful applications
 on top of existing web platforms.
 
-### LinkedIn Automation
+### App Actions
 
-- Create and publish posts
-- Retrieve user connections
-- Follow company pages
-- Send messages to connections
-- Get user profile information
-- Send connection requests
+#### LinkedIn
 
-### Amazon Automation
+| Feature                   | Function Name           |
+|---------------------------|-------------------------|
+| Create a post             | `createPost`            |
+| Get connections           | `getConnections`        |
+| Follow a company          | `followCompanyPage`     |
+| Send a message            | `sendMessage`           |
+| Get user info             | `getUserInfo`           |
+| Send connection request   | `sendConnectionRequest` |
 
-- Search for items
-- Add items to cart
-- Navigate through the checkout process
-- Retrieve order history
+#### Amazon
+
+| Feature           | Function Name |
+|-------------------|---------------|
+| Get all orders    | `getAllOrders`|
+| Search for an item| `searchItem`  |
+
+#### Instagram
+
+| Feature              | Function Name |
+|----------------------|---------------|
+| Send a direct message| `sendMessage` |
 
 ## Why Use This Library?
 
