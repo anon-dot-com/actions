@@ -62,55 +62,104 @@ applications.
 ## Prerequisites
 
 - Anon SDK (including necessary credentials and setup)
-- Node.js (version X.X.X or higher)
+- Node.js (version 18.0.0 or higher)
 - Playwright
 
 ## Installation
 
-To use the Anon example library, you would need to run the following actions
+The Anon's actions library is currently in private beta. To get access and start building on Anon's platform:
 
-```bash
-npm install @anon/actions
-```
+1. [Request access here](https://anondotcom.typeform.com/request-access).
+
+2. Once approved, you'll receive API credentials, including an `NPM_TOKEN`, via a 1Password vault.
+
+3. Set up your environment:
+   - Ensure you have Node.js (version 18.0.0 or higher) installed
+   - Set the `NPM_TOKEN` environment variable:
+
+     ```bash
+     export NPM_TOKEN=<your-npm-token>
+     ```
+
+   This token allows access to Anon's private npm packages.
+
+4. Install the Anon actions library in your Node.js project:
+
+   ```bash
+   npm install @anon/actions
+   ```
+
+5. You're now ready to use the Anon actions library! See the "Usage" section below for examples on how to get started
+with your first Anon-powered application.
 
 ## Usage
 
 Here's how you can use these actions to quickly build interactive AI agents or automated workflows:
 
-```javascript
-import {
-  NetworkHelper,
-  runCreateLinkedinPost
-} from "@anon/actions";
+```ts
+import { LinkedIn, NetworkHelper } from "@anon/actions";
 import {
   Client,
   executeRuntimeScript,
   setupAnonBrowserWithContext,
 } from "@anon/sdk-typescript";
-import { Page } from "playwright";
 
-console.log(
-`Setting up browser script for ${account.app} session for app user id ${APP_USER_ID}`,
-);
-const { browserContext } = await setupAnonBrowserWithContext(
-    client,
-    account,
-    { type: "local", input: { headless: false } },
-);
+const APP_USER_ID = process.env.ANON_APP_USER_ID!;
+const API_KEY = process.env.ANON_API_KEY!;
+const ENV = (process.env.ENV as "local" | "sandbox" | "prod" | "staging") || "sandbox";
+const validEnvironments: Array<"local" | "sandbox" | "prod" | "staging"> = ["local", "sandbox", "prod", "staging"];
+if (!validEnvironments.includes(ENV)) {
+  throw new Error("Invalid env");
+}
 
-const message = `This post was constructed with the Anon SDK! Integrate your AI apps to the real world using Anon. Come
-check out https://www.anon.com/`
-const result = await executeRuntimeScript({
-    client,
-    account,
-    target: { browserContext: browserContext },
-    initialUrl: "https://www.linkedin.com",
-    run: runCreateLinkedinPost(new NetworkHelper(1000), message),
+const account = {
+  // check out our list of supported apps here: https://docs.anon.com/docs/getting-started/overview
+  // this should align with a session you uploaded with the web-link example
+  app: "linkedin",
+  // this is the "sub" field of your user's JWTs
+  userId: APP_USER_ID,
+};
+
+const client = new Client({
+  environment: ENV,
+  // create a server SdkClient and use its ApiKey
+  // for testing, can alternately use an admin member's api key
+  apiKey: API_KEY,
 });
+
+const main = async () => {
+  console.log(
+    `Setting up browser script for ${account.app} session for app user id ${APP_USER_ID}`,
+  );
+  const { browserContext } = await setupAnonBrowserWithContext(
+    client,
+    account,
+    {
+      type: "local",
+      input: { headless: false, proxy: { isAnonProxyEnabled: true } },
+    },
+  );
+
+  const networkHelper = new NetworkHelper(10000);
+
+  const message = `This post was constructed with the Anon SDK! Integrate your AI apps to the real world using Anon. 
+  Come check out https://www.anon.com/`
+  await executeRuntimeScript({
+    client,
+    account,
+    target: { browserContext },
+    initialUrl: "https://www.linkedin.com",
+    run: LinkedIn.createPost(networkHelper, message),
+  });
+};
+
+main();
 ```
 
+In this particular example, we are making a post on LinkedIn.
+
 These examples demonstrate how you can quickly build interactive AI agents that perform actions on LinkedIn and Amazon
-using Anon and this library.
+using the Anon action library.
 
 ## Building on Top of This Library
 
