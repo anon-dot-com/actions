@@ -50,7 +50,7 @@ mkYarnPackage rec {
   buildPhase = ''
     export HOME=$(mktemp -d)
     yarn --offline --frozen-lockfile --production=true build
-    npx rollup deps/${pname}/${pkgJSON.main} --file deps/${pname}/${pkgJSON.exports.require} --format cjs
+    npx rollup deps/${pname}/${pkgJSON.main} --file deps/${pname}/${pkgJSON.exports.".".require} --format cjs
   '';
 
   postFixup = lib.optionals doDist (libanon.fixupPublishedVersions {
