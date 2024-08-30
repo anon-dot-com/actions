@@ -57,23 +57,23 @@ export const getConnections =
  */
 export const followCompanyPage =
   (networkHelper: NetworkHelper, companyName: string) =>
-    async (page: Page): Promise<LinkedInFollowResult> => {
-      try {
-        await searchOnHomePage(page, networkHelper, companyName);
-        await clickFirstResultOnSearchPage("Companies", page, networkHelper);
-        await networkHelper.waitForNetworkIdle(page);
-        return await followCompanyOnCompanyPage(page, networkHelper, companyName);
-      } catch (error) {
-        console.error(`An error occurred: ${error}`);
-        await networkHelper.takeScreenshot(
-          page,
-          "linkedin",
-          `error-${companyName}`,
-        );
+  async (page: Page): Promise<LinkedInFollowResult> => {
+    try {
+      await searchOnHomePage(page, networkHelper, companyName);
+      await clickFirstResultOnSearchPage("Companies", page, networkHelper);
+      await networkHelper.waitForNetworkIdle(page);
+      return await followCompanyOnCompanyPage(page, networkHelper, companyName);
+    } catch (error) {
+      console.error(`An error occurred: ${error}`);
+      await networkHelper.takeScreenshot(
+        page,
+        "linkedin",
+        `error-${companyName}`,
+      );
 
-        return { type: "Error" };
-      }
-    };
+      return { type: "Error" };
+    }
+  };
 
 /**
  * Sends a LinkedIn message to a recipient. Your page must be logged in and must be on the recipient's profile page to send a message
@@ -84,11 +84,11 @@ export const followCompanyPage =
  */
 export const sendMessage =
   (networkHelper: NetworkHelper, recipient: string, message: string) =>
-    async (page: Page) => {
-      await searchOnHomePage(page, networkHelper, recipient);
-      await clickFirstResultOnSearchPage("People", page, networkHelper);
-      await sendMessageOnProfilePage(networkHelper, message, page);
-    };
+  async (page: Page) => {
+    await searchOnHomePage(page, networkHelper, recipient);
+    await clickFirstResultOnSearchPage("People", page, networkHelper);
+    await sendMessageOnProfilePage(networkHelper, message, page);
+  };
 
 /**
  * Gets the general information and contact info of a LinkedIn user. Your page must be logged in and must be on the user's profile page to get the user info
@@ -139,27 +139,45 @@ export const getUserInfo =
  */
 export const sendConnectionRequest =
   (networkHelper: NetworkHelper, personName: string, message?: string) =>
-    async (page: Page) => {
-      try {
-        await searchOnHomePage(page, networkHelper, personName);
-        await clickFirstResultOnSearchPage("People", page, networkHelper);
-        await clickConnectButtonOnPersonPage(page, networkHelper);
-        await fulfillConnectionRequestOnConnectionModal(
-          page,
-          networkHelper,
-          personName,
-          message,
-        );
-      } catch (error) {
-        console.error(`An error occurred: ${error}`);
-        await networkHelper.takeScreenshot(
-          page,
-          "linkedin",
-          `error-${personName}`,
-        );
-        throw new Error(`Cannot get user info for ${personName}`);
-      }
-    };
+  async (page: Page) => {
+    try {
+      await searchOnHomePage(page, networkHelper, personName);
+      await clickFirstResultOnSearchPage("People", page, networkHelper);
+      await clickConnectButtonOnPersonPage(page, networkHelper);
+      await fulfillConnectionRequestOnConnectionModal(
+        page,
+        networkHelper,
+        personName,
+        message,
+      );
+    } catch (error) {
+      console.error(`An error occurred: ${error}`);
+      await networkHelper.takeScreenshot(
+        page,
+        "linkedin",
+        `error-${personName}`,
+      );
+      throw new Error(`Cannot get user info for ${personName}`);
+    }
+  };
+
+// close any existing message overlays.
+async function closeMessageOverlay(page: Page) {
+  try {
+    const closeButton = await page.$('svg[data-test-icon="close-small"]');
+    if (closeButton) {
+      await closeButton.click();
+      console.log("Message overlay closed successfully.");
+      return true;
+    } else {
+      console.log("Close button not found. No existing messages to close.");
+      return false;
+    }
+  } catch (error) {
+    console.error("Error while trying to close message overlay:", error);
+    return false;
+  }
+}
 
 /**
  * Sends a LinkedIn message to a person. Your page must be logged in and must be on the recipient's profile page to send a message. That person must be a 1st degree connection to the delegated user
@@ -173,7 +191,12 @@ export const sendMessageOnProfilePage = async (
   page: Page,
 ) => {
   try {
+    while (await closeMessageOverlay(page)) {
+      // Continue closing overlays until no more are found
+    }
+
     // Wait for and click the "Message" button
+
     const messageButton = await page.waitForSelector(
       'button.pvs-profile-actions__action:has-text("Message")',
     );
@@ -188,8 +211,10 @@ export const sendMessageOnProfilePage = async (
     await networkHelper.waitForNetworkIdle(page);
 
     // Wait for and click the Send button using the more specific selector
-    await page.waitForSelector('button.msg-form__send-btn[type="submit"]');
-    await page.click('button.msg-form__send-btn[type="submit"]');
+    await networkHelper.retryWithBackoff(async () => {
+      await networkHelper.waitForSelector(page, 'button:has-text("Send")');
+      await page.click('button:has-text("Send")');
+    });
 
     console.log("Waiting for message send confirmation...");
     await Promise.race([
@@ -305,7 +330,7 @@ export const fulfillConnectionRequestOnConnectionModal = async (
     await page.fill(
       'textarea[name="message"]',
       message ||
-      "Hi, I'd like to connect with you on LinkedIn. I used the Anon SDK to help me do this",
+        "Hi, I'd like to connect with you on LinkedIn. I used the Anon SDK to help me do this",
     );
 
     await page.click('button:has-text("Send")');
