@@ -1,6 +1,6 @@
 {
   "name": "@anon/actions",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Run useful automated scripts on the most popular websites with Anon",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
