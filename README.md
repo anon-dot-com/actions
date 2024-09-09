@@ -69,27 +69,25 @@ applications.
 
 The Anon's actions library is currently in private beta. To get access and start building on Anon's platform:
 
-1. [Request access here](https://anondotcom.typeform.com/request-access).
+1. [Sign-up to get an API key](https://console.anon.com).
 
-2. Once approved, you'll receive API credentials, including an `NPM_TOKEN`, via a 1Password vault.
-
-3. Set up your environment:
+2. Set up your environment:
    - Ensure you have Node.js (version 18.0.0 or higher) installed
    - Set the `NPM_TOKEN` environment variable:
 
      ```bash
-     export NPM_TOKEN=<your-npm-token>
+     export NPM_TOKEN=YQtlU86MhKOXijPS
      ```
 
    This token allows access to Anon's private npm packages.
 
-4. Install the Anon actions library in your Node.js project:
+3. Install the Anon actions library in your Node.js project:
 
    ```bash
    npm install @anon/actions
    ```
 
-5. You're now ready to use the Anon actions library! See the "Usage" section below for examples on how to get started
+4. You're now ready to use the Anon actions library! See the "Usage" section below for examples on how to get started
 with your first Anon-powered application.
 
 ## Usage
