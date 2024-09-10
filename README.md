@@ -69,27 +69,19 @@ applications.
 
 The Anon's actions library is currently in private beta. To get access and start building on Anon's platform:
 
-1. [Request access here](https://anondotcom.typeform.com/request-access).
+1. Login to the [Anon Console](https://console.anon.com)
 
-2. Once approved, you'll receive API credentials, including an `NPM_TOKEN`, via a 1Password vault.
+2. Install the Anon actions library in your Node.js project:
 
-3. Set up your environment:
-   - Ensure you have Node.js (version 18.0.0 or higher) installed
-   - Set the `NPM_TOKEN` environment variable:
+    ```bash
+    npm install @anon/actions \
+    --registry=https://npm.cloudsmith.io/anon/anon-sdk/ \
+    --//npm.cloudsmith.io/anon/anon-sdk/:_authToken=YQtlU86MhKOXijPS
+    ```
 
-     ```bash
-     export NPM_TOKEN=<your-npm-token>
-     ```
+You're now ready to use the Anon actions library!
 
-   This token allows access to Anon's private npm packages.
-
-4. Install the Anon actions library in your Node.js project:
-
-   ```bash
-   npm install @anon/actions
-   ```
-
-5. You're now ready to use the Anon actions library! See the "Usage" section below for examples on how to get started
+See the "Usage" section below for examples on how to get started
 with your first Anon-powered application.
 
 ## Usage
@@ -172,4 +164,4 @@ You can extend these actions to create more complex AI-driven applications. Some
 
 The possibilities are endless with Anon and these pre-built actions!
 
-Are you interested? Fill out [this survey]([https://anondotcom.typeform.com/request-access).
+Are you interested in learning more? Fill out [this access form]([https://anondotcom.typeform.com/request-access).
