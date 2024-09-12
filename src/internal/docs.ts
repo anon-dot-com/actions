@@ -109,7 +109,9 @@ function generateMarkdown(docs: DocEntry[]): string {
     );
 
     if (exportedFunctionsWithDocs.length > 0) {
-      markdown += `## ${fileName}\n\n`;
+      const capitalizedFileName =
+        fileName.charAt(0).toUpperCase() + fileName.slice(1);
+      markdown += `## ${capitalizedFileName}\n\n`;
       markdown += "| Function Name | Feature |\n";
       markdown += "|---------------|----------|\n";
 
