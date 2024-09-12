@@ -9,12 +9,9 @@
 | `searchItem` | Searches for a specified item on Amazon |
 | `addItemToCartOnProductPage` | Adds the current item to the cart from the product page |
 | `submitCheckoutOnCheckoutPage` | Submits the checkout process on the Amazon checkout page |
-| `clickFirstVisibleItemOnSearchPage` |  |
 | `navigateToCheckoutPage` | Navigates to the checkout page from the current page |
 | `navigateToAccountPage` | Navigates to the account page from the current page |
 | `navigateToOrdersPage` | Navigates to the orders page from the current page |
-| `extractOrdersInfo` |  |
-| `extractSingleOrderInfo` |  |
 
 ## instagram
 
@@ -25,7 +22,6 @@
 | `closeNotificationModal` | Handles the notification modal if it appears |
 | `selectRecipientOnDirectMessage` | Opens up a new message modal and selects a recipient |
 | `sendMessageOnMessageModal` | Sends a message to the selected recipient |
-| `waitForMessageSent` |  |
 
 ## linkedin
 
@@ -37,12 +33,9 @@
 | `sendMessage` | Sends a LinkedIn message to a recipient |
 | `getUserInfo` | Gets the general information and contact info of a LinkedIn user |
 | `sendConnectionRequest` | Sends a LinkedIn connection request to a person |
-| `closeMessageOverlay` |  |
 | `sendMessageOnProfilePage` | Sends a LinkedIn message to a person |
 | `clickFirstResultOnSearchPage` | Clicks on the first result of a search page based on the search query type |
 | `searchOnHomePage` | Writes a search query  on LinkedIn |
-| `clickConnectButtonOnPersonPage` |  |
-| `fulfillConnectionRequestOnConnectionModal` |  |
 | `readProfileIntroOnPersonPage` | Reads the profile intro of a LinkedIn user |
 | `readContactInfoOnContactModal` | Reads the contact info of a LinkedIn user |
 | `withContactInfoModal` | Clicks on the connect button on a LinkedIn profile page and runs callback that is designed for that callback |

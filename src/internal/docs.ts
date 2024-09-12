@@ -101,19 +101,25 @@ function generateMarkdown(docs: DocEntry[]): string {
 
   // Generate the summary table for each file
   for (const [fileName, entries] of Object.entries(entriesByFile)) {
-    markdown += `## ${fileName}\n\n`;
-    markdown += "| Function Name | Feature |\n";
-    markdown += "|---------------|----------|\n";
-
-    const exportedFunctions = entries.filter(
-      (entry) => entry.isFunction && entry.isExported,
+    const exportedFunctionsWithDocs = entries.filter(
+      (entry) =>
+        entry.isFunction &&
+        entry.isExported &&
+        entry.documentation.trim() !== "",
     );
-    exportedFunctions.forEach((func) => {
-      const feature = func.documentation.split(".")[0].trim(); // Get the first sentence of the documentation as the feature description
-      markdown += `| \`${func.name}\` | ${feature} |\n`;
-    });
 
-    markdown += "\n";
+    if (exportedFunctionsWithDocs.length > 0) {
+      markdown += `## ${fileName}\n\n`;
+      markdown += "| Function Name | Feature |\n";
+      markdown += "|---------------|----------|\n";
+
+      exportedFunctionsWithDocs.forEach((func) => {
+        const feature = func.documentation.split(".")[0].trim(); // Get the first sentence of the documentation as the feature description
+        markdown += `| \`${func.name}\` | ${feature} |\n`;
+      });
+
+      markdown += "\n";
+    }
   }
 
   return markdown;
