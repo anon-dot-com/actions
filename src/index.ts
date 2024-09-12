@@ -1,7 +1,7 @@
-import Amazon from "./amazon/index.js";
-import Instagram from "./instagram/index.js";
-import IpAddressUtil from "./ipAddressUtil/index.js";
-import LinkedIn from "./linkedin/index.js";
+import Amazon from "./app/amazon.js";
+import Instagram from "./app/instagram.js";
+import IpAddressUtil from "./ipAddressUtil.js";
+import LinkedIn from "./app/linkedin.js";
 
-export * from "./networkHelper.js";
+export { NetworkHelper } from "./networkHelper.js";
 export { Amazon, Instagram, LinkedIn, IpAddressUtil };

@@ -13,28 +13,29 @@
       "types": "./dist/index.d.ts"
     },
     "./ipAddressUtil": {
-      "import": "./dist/ipAddressUtil/index.js",
-      "require": "./dist/ipAddressUtil/index.cjs",
-      "types": "./dist/ipAddressUtil/index.d.ts"
+      "import": "./dist/ipAddressUtil.js",
+      "require": "./dist/ipAddressUtil.cjs",
+      "types": "./dist/ipAddressUtil.d.ts"
     },
     "./amazon": {
-      "import": "./dist/amazon/index.js",
-      "require": "./dist/amazon/index.cjs",
-      "types": "./dist/amazon/index.d.ts"
+      "import": "./dist/amazon.js",
+      "require": "./dist/amazon.cjs",
+      "types": "./dist/amazon.d.ts"
     },
     "./linkedin": {
-      "import": "./dist/linkedin/index.js",
-      "require": "./dist/linkedin/index.cjs",
-      "types": "./dist/linkedin/index.d.ts"
+      "import": "./dist/linkedin.js",
+      "require": "./dist/linkedin.cjs",
+      "types": "./dist/linkedin.d.ts"
     },
     "./instagram": {
-      "import": "./dist/instagram/index.js",
-      "require": "./dist/instagram/index.cjs",
-      "types": "./dist/instagram/index.d.ts"
+      "import": "./dist/instagram.js",
+      "require": "./dist/instagram.cjs",
+      "types": "./dist/instagram.d.ts"
     }
   },
   "scripts": {
     "build": "tsc",
+    "docs": "typedoc --out docs src",
     "postinstall": "just installDependencies"
   },
   "keywords": [],
