@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "docs.ts",
   "scripts": {
-    "start": "ts-node docs.ts",
+    "start": "ts-node docs.ts ../app -o README-combined.md",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
