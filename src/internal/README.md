@@ -2,12 +2,16 @@
 
 Generates README.md from TypeScript files.
 
-## Quick Start
+If modifying this generator, use this thread:
+
+https://claude.ai/chat/ce23bbad-b80e-4638-a573-d2cd6d316137
+
+## Quickstart
 
 ```bash
 # Install dependencies
-yarn install
+yarn
 
 # Run the generator
-yarn start ../instagram/index.ts -o README-instagram.md
+yarn start
 ```
