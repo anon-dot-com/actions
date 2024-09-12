@@ -7,8 +7,7 @@
 | `demoAddHeadphonesToCart` | Automates the process of adding AirPods to the cart on Amazon |
 | `getAllOrders` | Retrieves all orders from the Amazon account |
 | `searchItem` | Searches for a specified item on Amazon |
-| `addItemToCartOnProductPage` | /**
- Adds the current item to the cart from the product page |
+| `addItemToCartOnProductPage` | Adds the current item to the cart from the product page |
 | `submitCheckoutOnCheckoutPage` | Submits the checkout process on the Amazon checkout page |
 | `clickFirstVisibleItemOnSearchPage` |  |
 | `navigateToCheckoutPage` | Navigates to the checkout page from the current page |
