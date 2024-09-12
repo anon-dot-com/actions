@@ -1,0 +1,17 @@
+{
+  "name": "internal",
+  "version": "1.0.0",
+  "main": "docs.ts",
+  "scripts": {
+    "start": "ts-node docs.ts ../app -o README-combined.md",
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "typescript": "^4.5.5"
+  },
+  "devDependencies": {
+    "@types/node": "^16.11.12",
+    "ts-node": "^10.4.0"
+  }
+}

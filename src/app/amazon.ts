@@ -62,10 +62,9 @@ export const searchItem =
   };
 
 /**
-/**
  * Adds the current item to the cart from the product page.
  * Note: This function may not work for subscription items like medication, food or clothing
- * 
+ *
  * @param networkHelper - Helper object for network-related operations
  * @param page - Playwright Page object that should be on an Amazon product page
  */
