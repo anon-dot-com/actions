@@ -1,4 +1,4 @@
-# Anon Web Automation Library
+# Anon Actions Library
 
 ## Overview
 
@@ -185,6 +185,8 @@ You can extend these actions to create more complex AI-driven applications. Some
 3. A cross-platform social media manager
 4. An automated job application system using LinkedIn
 
-The possibilities are endless with Anon and these pre-built actions!
+If you have an idea on how to improve this library or want to contribute your own actions, please see the [CONTRIBUTING.md](CONTRIBUTING.md) guide.
+
+---
 
 Are you interested in learning more? Fill out [this access form]([https://anondotcom.typeform.com/request-access).
