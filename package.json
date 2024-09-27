@@ -46,8 +46,9 @@
     "tsconfig-paths": "^4.2.0"
   },
   "dependencies": {
-    "playwright": "^1.43.1",
-    "playwright-extra": "^4.3.6"
+    "playwright": "1.47.2",
+    "playwright-core": "1.47.2",
+    "playwright-extra": "4.3.6"
   },
   "files": [
     "dist/**/*"
