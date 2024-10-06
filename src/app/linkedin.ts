@@ -23,6 +23,17 @@ export type LinkedInFollowResult =
   | { type: "No Effect" }
   | { type: "Error"; description?: string };
 
+interface LinkedInMessage {
+  sender: string;
+  content: string;
+  timestamp: string;
+}
+
+interface LinkedInConversation {
+  participant: string;
+  messages: LinkedInMessage[];
+}
+
 /**
  * Creates a LinkedIn post. Your page must be logged in and must be on the LinkedIn home page to create a post
  * @param networkHelper - Helper object for network-related operations
@@ -160,6 +171,91 @@ export const sendConnectionRequest =
       throw new Error(`Cannot get user info for ${personName}`);
     }
   };
+
+/**
+ * Downloads all existing messages for the logged-in LinkedIn user
+ * @param networkHelper - Helper object for network-related operations
+ * @returns An array of LinkedInConversation objects containing message information
+ */
+export const getMessages = (networkHelper: NetworkHelper) => async (page: Page): Promise<LinkedInConversation[]> => {
+  try {
+    await navigateToMessagingPage(networkHelper, page);
+    const conversations = await getConversationList(networkHelper, page);
+    const allMessages: LinkedInConversation[] = [];
+
+    for (const conversation of conversations) {
+      await openConversation(networkHelper, page, conversation);
+      const messages = await getConversationMessages(networkHelper, page);
+      allMessages.push({
+        participant: conversation,
+        messages: messages
+      });
+    }
+
+    return allMessages;
+  } catch (error) {
+    console.error("Error in getMessages:", error);
+    throw new Error("Failed to get messages");
+  }
+};
+
+/**
+ * Navigates to the LinkedIn messaging page
+ * @param networkHelper - Helper object for network-related operations
+ * @param page - Playwright Page object
+ */
+async function navigateToMessagingPage(networkHelper: NetworkHelper, page: Page) {
+  await networkHelper.retryWithBackoff(async () => {
+    await page.click('a[href="/messaging/"]');
+    await networkHelper.waitForPageLoad(page);
+  });
+}
+
+/**
+ * Gets the list of conversations from the messaging page
+ * @param networkHelper - Helper object for network-related operations
+ * @param page - Playwright Page object
+ * @returns An array of conversation participant names
+ */
+async function getConversationList(networkHelper: NetworkHelper, page: Page): Promise<string[]> {
+  return await networkHelper.retryWithBackoff(async () => {
+    await page.waitForSelector('.msg-conversation-listitem__participant-names');
+    return page.$$eval('.msg-conversation-listitem__participant-names', 
+      elements => elements.map(el => el.textContent?.trim() || ""));
+  });
+}
+
+/**
+ * Opens a specific conversation
+ * @param networkHelper - Helper object for network-related operations
+ * @param page - Playwright Page object
+ * @param conversationName - Name of the conversation participant
+ */
+async function openConversation(networkHelper: NetworkHelper, page: Page, conversationName: string) {
+  await networkHelper.retryWithBackoff(async () => {
+    await page.click(`.msg-conversation-listitem__participant-names:has-text("${conversationName}")`);
+    await networkHelper.waitForPageLoad(page);
+  });
+}
+
+/**
+ * Gets all messages from the currently open conversation
+ * @param networkHelper - Helper object for network-related operations
+ * @param page - Playwright Page object
+ * @returns An array of LinkedInMessage objects
+ */
+async function getConversationMessages(networkHelper: NetworkHelper, page: Page): Promise<LinkedInMessage[]> {
+  return await networkHelper.retryWithBackoff(async () => {
+    await page.waitForSelector('.msg-s-message-list__event');
+    return page.$$eval('.msg-s-message-list__event', elements => 
+      elements.map(el => ({
+        sender: el.querySelector('.msg-s-message-group__profile-link')?.textContent?.trim() || "",
+        content: el.querySelector('.msg-s-event-listitem__body')?.textContent?.trim() || "",
+        timestamp: el.querySelector('.msg-s-message-group__timestamp')?.textContent?.trim() || ""
+      }))
+    );
+  });
+}
 
 // close any existing message overlays.
 async function closeMessageOverlay(page: Page) {
@@ -818,4 +914,5 @@ export default {
   clickPostButton,
   navigateToProfile,
   navigateToConnections,
+  getMessages,
 };
